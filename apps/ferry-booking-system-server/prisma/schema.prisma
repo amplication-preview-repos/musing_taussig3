@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Booking {
+  bookingDate        DateTime?
+  createdAt          DateTime           @default(now())
+  fleet              Fleet?             @relation(fields: [fleetId], references: [id])
+  fleetId            String?
+  id                 String             @id @default(cuid())
+  numberOfPassengers Int?
+  passengerLists     PassengerList[]
+  status             EnumBookingStatus?
+  travelDate         DateTime?
+  updatedAt          DateTime           @updatedAt
+  user               User?              @relation(fields: [userId], references: [id])
+  userId             String?
+}
+
+model Fleet {
+  arrivalLocation   String?
+  bookings          Booking[]
+  capacity          Int?
+  createdAt         DateTime  @default(now())
+  departureLocation String?
+  ferryName         String?
+  id                String    @id @default(cuid())
+  schedule          Json?
+  updatedAt         DateTime  @updatedAt
+}
+
+model SalesReport {
+  createdAt  DateTime  @default(now())
+  currency   String?
+  id         String    @id @default(cuid())
+  reportDate DateTime?
+  totalSales Float?
+  updatedAt  DateTime  @updatedAt
+}
+
+model PassengerList {
+  booking        Booking?  @relation(fields: [bookingId], references: [id])
+  bookingId      String?
+  createdAt      DateTime  @default(now())
+  ferry          String?
+  id             String    @id @default(cuid())
+  passengerEmail String?
+  passengerName  String?
+  travelDate     DateTime?
+  updatedAt      DateTime  @updatedAt
+}
+
+model User {
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  email     String?   @unique
+  firstName String?
+  id        String    @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime  @updatedAt
+  username  String    @unique
+}
+
+enum EnumBookingStatus {
+  Option1
+}
